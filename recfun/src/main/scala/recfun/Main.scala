@@ -28,12 +28,16 @@ object Main {
     import scala.annotation.tailrec
 
     @tailrec
-    def isBalanced(chars: List[Char], scanned_lparens_cnt: Int): Boolean = {
-      if (chars.isEmpty && scanned_lparens_cnt == 0) true
-      else if (scanned_lparens_cnt < 0) false
+    def isBalanced(chars: List[Char], open_lparens_cnt: Int): Boolean = {
+      if (chars.isEmpty && open_lparens_cnt == 0) true
+      else if (open_lparens_cnt < 0) false
       else {
-        val head_lparens_cnt = if (chars.head == '(') 1 else -1
-        isBalanced(chars.tail, scanned_lparens_cnt + head_lparens_cnt)
+        val head_lparens_cnt = {
+          if (chars.head == '(') 1 
+          else if (chars.head == ')') -1 
+          else 0
+        }
+        isBalanced(chars.tail, open_lparens_cnt + head_lparens_cnt)
       }
     }
 
@@ -45,8 +49,14 @@ object Main {
    */
   def countChange(money: Int, coins: List[Int]): Int = {
     if (money == 0) 1
-    else if (money > 0 && !coins.isEmpty) 
-      countChange(money - coins.head, coins.tail) + countChange(money, coins.tail)
+    else if (money > 0 && !coins.isEmpty) {
+      val max_head_coin_cnt = money / coins.head
+      var ways = 0
+      for (i <- 0 to max_head_coin_cnt) {
+        ways += countChange(money - coins.head * i, coins.tail)
+      }
+      ways
+    }
     else
       0
   }
