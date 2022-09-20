@@ -69,20 +69,9 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def mostRetweeted: Tweet = {
-    var max = 0
-    var result: Tweet = null
+  def mostRetweeted: Tweet
 
-    val update_max = (tweet: Tweet) => 
-      if (tweet.retweets > max) {
-        max = tweet.retweets
-        result = tweet
-      }
-
-    this.foreach(update_max)
-    result
-  }
-
+  def empty: Boolean
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
    * in descending order. In other words, the head of the resulting list should
@@ -129,6 +118,9 @@ class Empty extends TweetSet {
 
   def union(that: TweetSet): TweetSet = that
 
+  def mostRetweeted: Tweet = throw new NoSuchElementException
+
+  def empty: Boolean = true
 
   def descendingByRetweet: TweetList = Nil
   /**
