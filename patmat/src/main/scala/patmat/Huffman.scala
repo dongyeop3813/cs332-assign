@@ -26,9 +26,17 @@ object Huffman {
 
   // Part 1: Basics
 
-  def weight(tree: CodeTree): Int = ??? // tree match ...
+  def weight(tree: CodeTree): Int = {
+    tree match
+      case Fork => tree.weight
+      case Leaf => tree.weight
+  } // tree match ...
 
-  def chars(tree: CodeTree): List[Char] = ??? // tree match ...
+  def chars(tree: CodeTree): List[Char] = {
+    tree match
+      case Fork => chars
+      case Leaf => List(char)
+  } // tree match ...
 
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
@@ -71,7 +79,33 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+
+
+
+  def times(chars: List[Char]): List[(Char, Int)] = {
+
+    def add_char_to_acc (new_char: Char, acc: List[(Char, Int)]) = {
+      val match_with_new_char = (key: (Char, Int)) => key._1 == new_char
+      val add_if_key_is_newchar = (key: (Char, Int)) => 
+        if (key._1 == new_char) key._2 + 1 else key._2
+
+      if (acc.exists(match_with_new_char))
+        acc.map(add_if_key_is_newchar)
+      else
+        (new_char, 1) :: acc
+    }
+
+    def parse(chars: List[Char], acc: List[(Char, Int)]): List[(Char, Int)] = {
+      if (chars.isEmpty) acc
+      else {
+        val new_char = chars.head
+        val new_acc = add_char_to_acc (new_char, acc)
+        parse(chars.tail, new_acc)
+      }
+    }
+
+    parse(chars, Nil)
+  }
 
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -80,12 +114,18 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+    val less_freq = (x: (Char, Int), y: (Char, Int)): Boolean => x._2 < y._2
+    val sorted_freqs = freqs.sortWith(less_freq)
+
+    val convert_freq_to_leaf = (freq: (Char, Int)) => Leaf(freq._1, freq._2)
+    sorted_freqs.map(convert_freq_to_leaf)
+  }
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = (!trees.isEmpty) && trees.tail.isEmpty
 
   /**
    * The parameter `trees` of this function is a list of code trees ordered
@@ -99,7 +139,21 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  def combine(trees: List[CodeTree]): List[CodeTree] = {
+    if (trees.isEmpty || trees.tail.isEmpty) trees
+    else {
+      val smallest_weight_tree = trees.head
+      val second_smallest_weight_tree = trees.tail.head
+      val combined_new_tree = makeCodeTree(smallest_weight_tree, second_smallest_weight_tree)
+
+      val remainder = tree.tail.tail
+      val less_than_new_tree_weight = (x:CodeTree) => x.weight < combined_new_tree.weight
+
+      remainder.partition(less_than_new_tree_weight) match {
+        case (less, greater) => less ::: combined_new_tree ::: greater
+      }
+    }
+  }
 
   /**
    * This function will be called in the following way:
