@@ -172,7 +172,10 @@ object Huffman {
    *    the example invocation. Also define the return type of the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-  def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+  def until[T](satisfied: T=>Boolean, transform: T=>T)(orig: T): T = {
+      if(orig.satisfied) orig
+      else until(satisfied, transform)(transform(orig))
+    }
 
   /**
    * This function creates a code tree which is optimal to encode the text `chars`.
