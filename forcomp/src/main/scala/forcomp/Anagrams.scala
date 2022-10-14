@@ -33,10 +33,35 @@ object Anagrams {
    *  Note: the uppercase and lowercase version of the character are treated as the
    *  same character, and are represented as a lowercase character in the occurrence list.
    */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences = {
+    val char_frequency: List[(Char, Int)] =
+      ((w groupBy {element:Char => element}) map { case (char, xs) => (char, xs.length)}).toList
+
+    char_frequency sortBy (_._1)
+  }
+
+  def occurenceConcat(a: Occurrences, b: Occurrences): Occurrences = {
+    if (a.isEmpty) b
+    else if(b.isEmpty) a
+    else if(a.head._1 < b.head._1){
+      a.head :: occurenceConcat(a.tail, b)
+    }
+    else if(b.head._1 < a.head._1){
+      b.head :: occurenceConcat(a, b.tail)
+    }
+    else {
+      (a.head._1, a.head._2 + b.head._2) :: occurenceConcat(a.tail, b.tail)
+    }
+  }
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = ???
+  def sentenceOccurrences(s: Sentence): Occurrences = {
+    def accumulate(acc:Occurrences, word:Word) = {
+      val word_occurrence = wordOccurrences(word)
+      occurenceConcat(acc, word_occurrence)
+    }
+    s.foldLeft(List[(Char, Int)]())(accumulate)
+  }
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
@@ -53,10 +78,14 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = ???
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = {
+    dictionary groupBy {x:Word => wordOccurrences(x)}
+  }
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = ???
+  def wordAnagrams(word: Word): List[Word] = {
+    dictionaryByOccurrences(wordOccurrences(word))
+  }
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
