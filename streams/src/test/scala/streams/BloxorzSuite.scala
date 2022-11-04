@@ -16,12 +16,15 @@ class BloxorzSuite extends FunSuite {
      * `startPos`. This can be used to verify if a certain list of moves
      * is a valid solution, i.e. leads to the goal.
      */
-    def solve(ls: List[Move]): Block =
+    def solve(ls: List[Move]): Block = {
+      print(ls)
+
       ls.foldLeft(startBlock) { case (block, move) => move match {
         case Left => block.left
         case Right => block.right
         case Up => block.up
         case Down => block.down
+      }
       }
     }
   }
